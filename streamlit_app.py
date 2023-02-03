@@ -44,28 +44,59 @@ myfile = st.file_uploader("Enter XLSX file")
 if myfile != None:
     df = pd.read_excel(myfile)
 
-    # Show the data as a table
-    #st.write(df)
-    # Create a pie chart with Plotly
-    fig = px.pie(df, values='Hours', names='Client',title='Hours by Client', hole=0.4)
-    st.plotly_chart(fig)
+    if "Amount" in df.columns: #expenses report
+        # Create a pie chart with Plotly
+        fig = px.pie(df, values='Amount', names='Client',title='Expenses by Client', hole=0.4)
+        fig.update_traces(textinfo='value',texttemplate='£%{value:,.2f}')
+        fig.update_layout(margin=dict(t=30, b=30, l=30, r=30))
+        st.plotly_chart(fig)
 
-    fig = px.pie(df, values='Hours', names='Project',title='Hours by Project', hole=0.4)
-    st.plotly_chart(fig)
+        fig = px.pie(df, values='Amount', names='Project',title='Expenses by Project', hole=0.4)
+        fig.update_traces(textinfo='value', texttemplate='£%{value:,.2f}')
+        fig.update_layout(margin=dict(t=30, b=30, l=30, r=30))
+        st.plotly_chart(fig)
 
-    #loop through the people
+        fig = px.pie(df, values='Amount', names='Category',title='Expenses by Category', hole=0.4)
+        fig.update_traces(textinfo='value', texttemplate='£%{value:,.2f}')
+        fig.update_layout(margin=dict(t=30, b=30, l=30, r=30))
+        st.plotly_chart(fig)
 
-    team_members = df['First Name'].unique().tolist()
 
-    for team_member in team_members:
-        filter_by_team_member(df,team_member)
+        fig = px.sunburst(df, path=['Project', 'Category'], values='Amount',labels=['Project', 'Category'])
+        fig.update_traces(textinfo='label+value',texttemplate='%{label}:\n £%{value:,.2f}')
+        fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
+        st.plotly_chart(fig)
 
-    #now select project and show who has worked on it
-    projects = df['Project'].unique().tolist()
-    this_project = st.selectbox("Choose project",options=projects)
-    mask = df["Project"] == this_project
-    filtered_df = df[mask]
-    fig = px.pie(filtered_df, values='Hours', names='First Name', title='Hours by Team Member for ' + this_project,
-                     hole=0.4)
-    st.plotly_chart(fig)
+        fig = px.sunburst(df, path=['Category','First name'], values='Amount',labels=['Category','First name'])
+        fig.update_traces(textinfo='label+value',texttemplate='%{label}:\n £%{value:,.2f}')
+        fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
+        st.plotly_chart(fig)
 
+        fig = px.bar(df, x="Amount", y="Notes", orientation='h')
+        st.plotly_chart(fig)
+
+    else: #time report
+        # Show the data as a table
+        #st.write(df)
+        # Create a pie chart with Plotly
+        fig = px.pie(df, values='Hours', names='Client',title='Hours by Client', hole=0.4)
+        st.plotly_chart(fig)
+
+        fig = px.pie(df, values='Hours', names='Project',title='Hours by Project', hole=0.4)
+        st.plotly_chart(fig)
+
+        #loop through the people
+
+        team_members = df['First Name'].unique().tolist()
+
+        for team_member in team_members:
+            filter_by_team_member(df,team_member)
+
+        #now select project and show who has worked on it
+        projects = df['Project'].unique().tolist()
+        this_project = st.selectbox("Choose project",options=projects)
+        mask = df["Project"] == this_project
+        filtered_df = df[mask]
+        fig = px.pie(filtered_df, values='Hours', names='First Name', title='Hours by Team Member for ' + this_project,
+                         hole=0.4)
+        st.plotly_chart(fig)
