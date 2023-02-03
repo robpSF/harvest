@@ -39,6 +39,7 @@ def filter_by_team_member(df, team_member):
 
 
 # Read the Excel file into a pandas DataFrame
+st.write("Export time report or expenses report from Harvest and then drag here for analysis")
 myfile = st.file_uploader("Enter XLSX file")
 
 if myfile != None:
